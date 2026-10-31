@@ -1,0 +1,15 @@
+# 统一换行：仓库里存 LF，任何人都检出为 LF（Python / shell / YAML 都更省心）
+* text=auto eol=lf
+
+# Windows 专属脚本保留 CRLF（某些 PowerShell/cmd 版本对 LF 敏感）
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# 二进制，别做任何转换
+*.png  binary
+*.ico  binary
+*.jpg  binary
+*.gif  binary
+*.zip  binary
+*.whl  binary
