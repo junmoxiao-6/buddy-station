@@ -29,7 +29,7 @@ import ssl
 import sys
 import time
 import urllib.parse
-from typing import Any
+from typing import Any, Protocol
 
 # 包内运行走相对导入；作为独立脚本（技能形态 / 单文件复制）运行时回退到同级导入。
 try:  # pragma: no cover - 取决于运行方式
@@ -70,6 +70,11 @@ LOG_NAME = "daily.jsonl"
 _OUT_FILE: str | None = None
 # 本次是否禁用通知（--no-notify）
 _NO_NOTIFY: bool = False
+
+
+class Channel(Protocol):
+    def call(self, method: str, path: str, body: dict | None = None,
+             timeout: float = 30.0) -> dict: ...
 
 
 # ---------------------------------------------------------------- 基础工具
