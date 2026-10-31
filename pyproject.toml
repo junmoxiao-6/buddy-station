@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "buddy-station"
+description = "WorkBuddy「Buddy 加油站」每日签到 + 猫猫旅行自动化的零依赖命令行工具"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "buddy-station contributors" }]
+keywords = ["workbuddy", "checkin", "automation", "cli", "daily-rewards"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
+# 版本单一真相源：从 buddy_station.__version__ 读取，避免 pyproject / __init__ 两处对不上
+dynamic = ["version"]
+dependencies = []          # 纯标准库，零第三方依赖
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "build>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/your-name/buddy-station"
+Source = "https://github.com/your-name/buddy-station"
+Issues = "https://github.com/your-name/buddy-station/issues"
+Changelog = "https://github.com/your-name/buddy-station/blob/main/CHANGELOG.md"
+
+[project.scripts]
+buddy-station = "buddy_station.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "buddy_station.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]

@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# 测试与类型检查
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# 运行时数据（绝不能被提交：里面有令牌、uid、每日记录）
+logs/
+*.jsonl
+last_result.json
+notify_config.json
+
+# 令牌 / 凭据（即便被误放到仓库里也不该入库）
+workbuddy.json
+device_state.json
+*.pem
+*.key
+.env
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

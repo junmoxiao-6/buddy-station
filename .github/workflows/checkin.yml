@@ -1,0 +1,85 @@
+name: Daily check-in
+
+# 定时签到 + 猫猫旅行闭环。
+#
+# 前置条件（只用做一次）：
+#   1. 本地执行 `buddy-station acquire-rt --show` 拿到 refresh token
+#   2. 仓库 Settings → Secrets and variables → Actions 新建 secret: WORKBUDDY_RT
+#
+# 说明：
+#   * cron 是 **UTC**，这里 00:05 / 06:05 / 12:05 / 18:05 UTC = 北京时间 08:05 / 14:05 / 20:05 / 次日 02:05
+#     （GitHub 的定时任务本身有几分钟到几十分钟的排队延迟，不必卡整点）
+#   * refresh token 会轮换；CI 的 secret 无法自动回写，失效后重新导出一次即可
+#   * 签到是幂等的，多跑不会重复加分；多跑是为了不错过"猫到店可领"的窗口
+
+on:
+  schedule:
+    - cron: "5 0,6,12,18 * * *"
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "凭据通道（rt 用 secret，token_file 需要自备令牌文件）"
+        required: false
+        default: "rt"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checkin
+  cancel-in-progress: false
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: python -m pip install -e .
+
+      - name: Preflight (read-only)
+        env:
+          WORKBUDDY_RT: ${{ secrets.WORKBUDDY_RT }}
+        run: |
+          python -m buddy_station diagnose || true
+
+      - name: Run
+        id: run
+        env:
+          WORKBUDDY_RT: ${{ secrets.WORKBUDDY_RT }}
+          CHANNEL: ${{ github.event.inputs.channel || 'rt' }}
+        run: |
+          set +e
+          python -m buddy_station run --channel "$CHANNEL" --allow-unverified-uid | tee result.json
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          echo "### 签到结果（exit $code）" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat result.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$code"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkin-result-${{ github.run_number }}
+          path: result.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+      # 失败时把原因写进汇总，避免只有红叉没有信息
+      - name: Explain failure
+        if: failure()
+        run: |
+          echo "### 失败" >> "$GITHUB_STEP_SUMMARY"
+          echo "退出码 10 = 需要人工（鉴权失效 / 账号不符）" >> "$GITHUB_STEP_SUMMARY"
+          echo "退出码 20 = 没有可用通道（检查 WORKBUDDY_RT 是否已设置/是否过期）" >> "$GITHUB_STEP_SUMMARY"
+          echo "退出码 30 = 上游异常（可重试）" >> "$GITHUB_STEP_SUMMARY"

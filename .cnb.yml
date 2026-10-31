@@ -1,0 +1,25 @@
+# CNB（cnb.cool）流水线：可选，用于在 CNB 上定时签到
+#
+# 前置：仓库环境变量里配 WORKBUDDY_RT（refresh token，见 docs/cloud-deploy.md）
+# 说明：签到是幂等的，跑密一点无害；这里按 6 小时一次
+
+main:
+  # 手动触发一次
+  branch:
+    - name: checkin-once
+      stages:
+        - name: checkin
+          script: |
+            python3 -m pip install -e .
+            python3 -m buddy_station diagnose || true
+            python3 -m buddy_station run --channel rt --allow-unverified-uid
+
+  # 定时：每 6 小时
+  cron:
+    - name: checkin-every-6h
+      schedule: "5 0,6,12,18 * * *"
+      stages:
+        - name: checkin
+          script: |
+            python3 -m pip install -e .
+            python3 -m buddy_station run --channel rt --allow-unverified-uid

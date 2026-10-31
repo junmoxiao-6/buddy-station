@@ -1,0 +1,30 @@
+name: "Buddy 加油站值守"
+slug: "buddy-station-guardian"
+version: "2.0.0"
+summary: "WorkBuddy 每日签到 + 猫猫旅行闭环自动化（零依赖 CLI，可与 WorkBuddy 技能形态共用一套源码）"
+author: "buddy-station contributors"
+license: "MIT"
+homepage: "https://github.com/your-name/buddy-station"
+
+entrypoints:
+  cli: "buddy-station"
+  module: "python -m buddy_station"
+  legacy_scripts:
+    - "skill/scripts/checkin.py"
+    - "skill/scripts/device_login.py"
+
+requires:
+  python: ">=3.10"
+  third_party: []          # 纯标准库，无第三方依赖
+
+data_dir:
+  window: "%LOCALAPPDATA%\\buddy-station"
+  macos: "~/Library/Application Support/buddy-station"
+  linux: "${XDG_DATA_HOME:-~/.local/share}/buddy-station"
+  override_env: "BUDDY_STATION_HOME"
+
+description: >
+  每日签到领积分、猫猫旅行「先领后派」闭环、连签守护、余额展示、失败告警。
+  四种凭据通道（桌面 IPC / 令牌文件 / refresh token / 宿主令牌）覆盖
+  「有客户端、没客户端、纯 CI」三种环境；被调用一次即可把定时任务定下来（幂等）。
+  不读取、不解密任何客户端加密登录态文件。

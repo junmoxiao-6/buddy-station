@@ -1,0 +1,33 @@
+name: 功能建议
+description: 想要新的能力或改进
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你遇到的场景
+      description: 说明"现在要做什么很麻烦"，比直接给方案更有用
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望它怎么做
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 你试过的替代方案
+      description: 例如手动跑、用别的工具、写脚本
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: 边界确认
+      options:
+        - label: 这个建议不需要读取/解密客户端加密登录态
+        - label: 这个建议不需要自动下载并覆盖程序自身
+        - label: 这个建议不涉及批量刷分或多账号批量操作

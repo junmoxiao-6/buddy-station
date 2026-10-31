@@ -1,0 +1,86 @@
+name: Bug 报告
+description: 跑不通、结果不对、退出码看不懂——用这个
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **提交前请先跑这两个只读命令，把输出贴上来**（它们不含任何令牌）：
+
+        ```bash
+        buddy-station --version
+        buddy-station diagnose
+        ```
+
+        ⚠️ 请勿粘贴 `acquire-rt --show` 的输出、`workbuddy.json` 内容或任何以 `eyJ` 开头的字符串。
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: `buddy-station --version` 的输出
+      placeholder: "2.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - GitHub Actions / CI
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: command
+    attributes:
+      label: 出问题的命令
+      options:
+        - run
+        - checkin
+        - travel
+        - auth / login
+        - setup
+        - diagnose / probe
+        - acquire-rt
+        - update
+        - notify
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望发生什么
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际发生了什么
+      description: 贴完整的一行 JSON 输出与退出码（`echo $?` 或 `%ERRORLEVEL%`）
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnose
+    attributes:
+      label: diagnose 输出
+      description: 已脱敏（不含令牌）的 `buddy-station diagnose` 结果
+      render: json
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我已经确认上面没有粘贴任何令牌 / 凭据 / uid
+          required: true
