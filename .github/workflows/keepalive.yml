@@ -1,0 +1,36 @@
+name: Keepalive
+
+# 目的只有一个：每月产生一次提交。
+# 原因：GitHub 会在仓库连续 60 天无提交后自动停用 schedule 触发的 workflow，
+# 停用后签到会静默失效。本 workflow 每月写一次时间戳，让仓库保持"活跃"。
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"   # 每月 1 日 03:00 UTC = 北京 11:00
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  touch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump keepalive stamp
+        run: |
+          printf '%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .keepalive
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "chore: keepalive $(date -u +%Y-%m-%d)"
+            git push
+          fi
